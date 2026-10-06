@@ -1,0 +1,161 @@
+{
+  "object_classifier_type": "CompositeClassifier",
+  "classifiers": [
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: SPINK4 - Cy5: Mean",
+        "pathClassBelow": {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "pathClassEquals": {
+          "name": "SPINK4+ Epithelial Cells",
+          "color": [
+            188,
+            62,
+            54
+          ]
+        },
+        "pathClassAbove": {
+          "name": "SPINK4+ Epithelial Cells",
+          "color": [
+            188,
+            62,
+            54
+          ]
+        },
+        "threshold": 1819.91
+      },
+      "pathClasses": [
+        {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "SPINK4+ Epithelial Cells",
+          "color": [
+            188,
+            62,
+            54
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1756925972800
+    },
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: HLA-DR - TRITC: Mean",
+        "pathClassBelow": {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "pathClassEquals": {
+          "name": "HLADR+ Epithelial Cells",
+          "color": [
+            167,
+            220,
+            126
+          ]
+        },
+        "pathClassAbove": {
+          "name": "HLADR+ Epithelial Cells",
+          "color": [
+            167,
+            220,
+            126
+          ]
+        },
+        "threshold": 5696.0908
+      },
+      "pathClasses": [
+        {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "HLADR+ Epithelial Cells",
+          "color": [
+            167,
+            220,
+            126
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1756925736262
+    },
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: CD74 - Cy5: Mean",
+        "pathClassBelow": {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "pathClassEquals": {
+          "name": "CD74+ Epithelial Cells",
+          "color": [
+            241,
+            254,
+            65
+          ]
+        },
+        "pathClassAbove": {
+          "name": "CD74+ Epithelial Cells",
+          "color": [
+            241,
+            254,
+            65
+          ]
+        },
+        "threshold": 3978.91
+      },
+      "pathClasses": [
+        {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "CD74+ Epithelial Cells",
+          "color": [
+            241,
+            254,
+            65
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1756925834823
+    }
+  ]
+}

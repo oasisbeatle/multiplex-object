@@ -1,0 +1,52 @@
+{
+  "object_classifier_type": "SimpleClassifier",
+  "function": {
+    "classifier_fun": "ClassifyByMeasurementFunction",
+    "measurement": "Membrane: HLA-DR - TRITC: Mean",
+    "pathClassBelow": {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "pathClassEquals": {
+      "name": "HLADR+ Epithelial Cells",
+      "color": [
+        167,
+        220,
+        126
+      ]
+    },
+    "pathClassAbove": {
+      "name": "HLADR+ Epithelial Cells",
+      "color": [
+        167,
+        220,
+        126
+      ]
+    },
+    "threshold": 5696.0908
+  },
+  "pathClasses": [
+    {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "HLADR+ Epithelial Cells",
+      "color": [
+        167,
+        220,
+        126
+      ]
+    }
+  ],
+  "filter": "DETECTIONS_ALL",
+  "timestamp": 1756925736262
+}

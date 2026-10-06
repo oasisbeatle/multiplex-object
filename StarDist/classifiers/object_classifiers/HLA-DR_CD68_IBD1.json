@@ -1,0 +1,113 @@
+{
+  "object_classifier_type": "CompositeClassifier",
+  "classifiers": [
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Nucleus: DAPI (C1): Mean",
+        "pathClassEquals": {
+          "name": "Cell",
+          "color": [
+            0,
+            0,
+            255
+          ]
+        },
+        "pathClassAbove": {
+          "name": "Cell",
+          "color": [
+            0,
+            0,
+            255
+          ]
+        },
+        "threshold": 13477.71
+      },
+      "pathClasses": [
+        {
+          "name": "Cell",
+          "color": [
+            0,
+            0,
+            255
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1754508579177
+    },
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: CD68 - TRITC: Mean",
+        "pathClassEquals": {
+          "name": "CD68+",
+          "color": [
+            255,
+            255,
+            0
+          ]
+        },
+        "pathClassAbove": {
+          "name": "CD68+",
+          "color": [
+            255,
+            255,
+            0
+          ]
+        },
+        "threshold": 1410.36
+      },
+      "pathClasses": [
+        {
+          "name": "CD68+",
+          "color": [
+            255,
+            255,
+            0
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1754507670619
+    },
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Cell: HLA-DR - TRITC: Mean",
+        "pathClassEquals": {
+          "name": "HLA-DR+",
+          "color": [
+            255,
+            255,
+            255
+          ]
+        },
+        "pathClassAbove": {
+          "name": "HLA-DR+",
+          "color": [
+            255,
+            255,
+            255
+          ]
+        },
+        "threshold": 2473.09
+      },
+      "pathClasses": [
+        {
+          "name": "HLA-DR+",
+          "color": [
+            255,
+            255,
+            255
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1754507002612
+    }
+  ]
+}

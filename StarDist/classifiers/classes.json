@@ -1,0 +1,108 @@
+{
+  "pathClasses": [
+    {
+      "name": "Epithelial Cells",
+      "color": -65536
+    },
+    {
+      "name": "Cell of Interest",
+      "color": -65536
+    },
+    {
+      "name": "DAPI (C1)",
+      "color": -65536
+    },
+    {
+      "name": "Plasma Cells",
+      "color": -3780271
+    },
+    {
+      "name": "B Cells",
+      "color": -256
+    },
+    {
+      "name": "HLA-DR+ Macrophages",
+      "color": -16744448
+    },
+    {
+      "name": "C11b+ Myeloid Cells",
+      "color": -16711681
+    },
+    {
+      "name": "aSMA+ Cells",
+      "color": -2148359
+    },
+    {
+      "name": "aSMA+ Cells: aSMA+S100+",
+      "color": -4075520
+    },
+    {
+      "name": "aSMA+Vimentin+: aSMA+ Cells",
+      "color": -9531392
+    },
+    {
+      "name": "aSMA+Vimentin+: aSMA+S100+",
+      "color": -16733269
+    },
+    {
+      "name": "aSMA+Vimentin+",
+      "color": -65536
+    },
+    {
+      "name": "aSMA+S100+",
+      "color": -5361565
+    },
+    {
+      "name": "CD74+ Epithelial Cells",
+      "color": -917951
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells",
+      "color": -4440522
+    },
+    {
+      "name": "Epithelial Cells: HLA-DR+ Epithelial Cells",
+      "color": -16744448
+    },
+    {
+      "name": "Epithelial Cells: CD74+ Epithelial Cells",
+      "color": -16711936
+    },
+    {
+      "name": "Epithelial Cells: HLA-DR+ Epithelial Cells: CD74+ Epithelial Cells",
+      "color": -3997952
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells: Epithelial Cells",
+      "color": -256
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells: Epithelial Cells: CD74+ Epithelial Cells",
+      "color": -31744
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells: HLA-DR+ Epithelial Cells: CD74+ Epithelial Cells",
+      "color": -1
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells: HLA-DR+ Epithelial Cells: Epithelial Cells",
+      "color": -8355712
+    },
+    {
+      "name": "HLADR+ Epithelial Cells",
+      "color": -5776258
+    },
+    {
+      "name": "Epithelial Cells: HLADR+ Epithelial Cells",
+      "color": -16744448
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells: HLADR+ Epithelial Cells: CD74+ Epithelial Cells",
+      "color": -1
+    },
+    {
+      "name": "SPINK4+ Epithelial Cells: HLADR+ Epithelial Cells: Epithelial Cells",
+      "color": -31744
+    }
+  ]
+}

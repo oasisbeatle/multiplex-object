@@ -1,0 +1,109 @@
+{
+  "object_classifier_type": "CompositeClassifier",
+  "classifiers": [
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: Vimentin - Cy5 (C20): Mean",
+        "pathClassBelow": {
+          "name": "aSMA+ Cells",
+          "color": [
+            223,
+            55,
+            249
+          ]
+        },
+        "pathClassEquals": {
+          "name": "aSMA+Vimentin+",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "pathClassAbove": {
+          "name": "aSMA+Vimentin+",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "threshold": 6684.32
+      },
+      "pathClasses": [
+        {
+          "name": "aSMA+ Cells",
+          "color": [
+            223,
+            55,
+            249
+          ]
+        },
+        {
+          "name": "aSMA+Vimentin+",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1755709385275
+    },
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: S100 - Cy5: Mean",
+        "pathClassBelow": {
+          "name": "aSMA+ Cells",
+          "color": [
+            223,
+            55,
+            249
+          ]
+        },
+        "pathClassEquals": {
+          "name": "aSMA+S100+",
+          "color": [
+            174,
+            48,
+            99
+          ]
+        },
+        "pathClassAbove": {
+          "name": "aSMA+S100+",
+          "color": [
+            174,
+            48,
+            99
+          ]
+        },
+        "threshold": 1200.14
+      },
+      "pathClasses": [
+        {
+          "name": "aSMA+ Cells",
+          "color": [
+            223,
+            55,
+            249
+          ]
+        },
+        {
+          "name": "aSMA+S100+",
+          "color": [
+            174,
+            48,
+            99
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1755709466594
+    }
+  ]
+}

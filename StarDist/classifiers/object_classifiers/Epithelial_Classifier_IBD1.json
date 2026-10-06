@@ -1,0 +1,36 @@
+{
+  "object_classifier_type": "SimpleClassifier",
+  "function": {
+    "classifier_fun": "ClassifyByMeasurementFunction",
+    "measurement": "Membrane: E-Cadherin - Cy5 (C18): Mean",
+    "pathClassEquals": {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "pathClassAbove": {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "threshold": 2308.2411461929173
+  },
+  "pathClasses": [
+    {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    }
+  ],
+  "filter": "DETECTIONS_ALL",
+  "timestamp": 1754506799890
+}

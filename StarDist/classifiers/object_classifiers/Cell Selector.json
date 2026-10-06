@@ -1,0 +1,36 @@
+{
+  "object_classifier_type": "SimpleClassifier",
+  "function": {
+    "classifier_fun": "ClassifyByMeasurementFunction",
+    "measurement": "Nucleus: DAPI (C1): Mean",
+    "pathClassEquals": {
+      "name": "Cell of Interest",
+      "color": [
+        189,
+        3,
+        197
+      ]
+    },
+    "pathClassAbove": {
+      "name": "Cell of Interest",
+      "color": [
+        189,
+        3,
+        197
+      ]
+    },
+    "threshold": 13504.6572265625
+  },
+  "pathClasses": [
+    {
+      "name": "Cell of Interest",
+      "color": [
+        189,
+        3,
+        197
+      ]
+    }
+  ],
+  "filter": "DETECTIONS_ALL",
+  "timestamp": 1754511901857
+}

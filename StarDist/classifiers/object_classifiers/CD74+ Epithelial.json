@@ -1,0 +1,52 @@
+{
+  "object_classifier_type": "SimpleClassifier",
+  "function": {
+    "classifier_fun": "ClassifyByMeasurementFunction",
+    "measurement": "Membrane: CD74 - Cy5: Mean",
+    "pathClassBelow": {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "pathClassEquals": {
+      "name": "CD74+ Epithelial Cells",
+      "color": [
+        241,
+        254,
+        65
+      ]
+    },
+    "pathClassAbove": {
+      "name": "CD74+ Epithelial Cells",
+      "color": [
+        241,
+        254,
+        65
+      ]
+    },
+    "threshold": 3978.91
+  },
+  "pathClasses": [
+    {
+      "name": "Epithelial Cells",
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "CD74+ Epithelial Cells",
+      "color": [
+        241,
+        254,
+        65
+      ]
+    }
+  ],
+  "filter": "DETECTIONS_ALL",
+  "timestamp": 1756925834823
+}

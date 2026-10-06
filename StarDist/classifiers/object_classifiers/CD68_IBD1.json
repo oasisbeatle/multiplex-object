@@ -1,0 +1,36 @@
+{
+  "object_classifier_type": "SimpleClassifier",
+  "function": {
+    "classifier_fun": "ClassifyByMeasurementFunction",
+    "measurement": "Membrane: CD68 - TRITC: Mean",
+    "pathClassEquals": {
+      "name": "CD68+",
+      "color": [
+        255,
+        255,
+        0
+      ]
+    },
+    "pathClassAbove": {
+      "name": "CD68+",
+      "color": [
+        255,
+        255,
+        0
+      ]
+    },
+    "threshold": 1410.36
+  },
+  "pathClasses": [
+    {
+      "name": "CD68+",
+      "color": [
+        255,
+        255,
+        0
+      ]
+    }
+  ],
+  "filter": "DETECTIONS_ALL",
+  "timestamp": 1754507670619
+}

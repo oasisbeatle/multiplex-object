@@ -1,0 +1,77 @@
+{
+  "object_classifier_type": "CompositeClassifier",
+  "classifiers": [
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Cell: HLA-DR - TRITC: Mean",
+        "pathClassEquals": {
+          "name": "HLA-DR+",
+          "color": [
+            255,
+            255,
+            255
+          ]
+        },
+        "pathClassAbove": {
+          "name": "HLA-DR+",
+          "color": [
+            255,
+            255,
+            255
+          ]
+        },
+        "threshold": 2473.09
+      },
+      "pathClasses": [
+        {
+          "name": "HLA-DR+",
+          "color": [
+            255,
+            255,
+            255
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1754507002612
+    },
+    {
+      "object_classifier_type": "SimpleClassifier",
+      "function": {
+        "classifier_fun": "ClassifyByMeasurementFunction",
+        "measurement": "Membrane: E-Cadherin - Cy5 (C18): Mean",
+        "pathClassEquals": {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "pathClassAbove": {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        },
+        "threshold": 2308.2411461929173
+      },
+      "pathClasses": [
+        {
+          "name": "Epithelial Cells",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        }
+      ],
+      "filter": "DETECTIONS_ALL",
+      "timestamp": 1754506799890
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "object_classifier_type": "SimpleClassifier",
+  "function": {
+    "classifier_fun": "ClassifyByMeasurementFunction",
+    "measurement": "Cell: HLA-DR - TRITC: Mean",
+    "pathClassEquals": {
+      "name": "HLA-DR+",
+      "color": [
+        255,
+        255,
+        255
+      ]
+    },
+    "pathClassAbove": {
+      "name": "HLA-DR+",
+      "color": [
+        255,
+        255,
+        255
+      ]
+    },
+    "threshold": 2473.09
+  },
+  "pathClasses": [
+    {
+      "name": "HLA-DR+",
+      "color": [
+        255,
+        255,
+        255
+      ]
+    }
+  ],
+  "filter": "DETECTIONS_ALL",
+  "timestamp": 1754507002612
+}
