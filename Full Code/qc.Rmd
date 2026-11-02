@@ -1,0 +1,609 @@
+---
+title: "qc"
+output: html_document
+---
+
+# Quality Control 
+In this document we look at the quality control metrics: and normalization QC, segmentation quality, image level QC, cell level QC. Let us the load each of the sample types from their
+RDS files. 
+
+```{r}
+ileum_cd <- readRDS("../data/output/spe/ileum_cd.rds")
+ileum_ctrl <- readRDS("../data/output/spe/ileum_ctrl.rds")
+```
+
+## Pre-QC Wrangling
+Before the QC step we create a total data frame which stores all of the four samples for better comparison.
+
+Combining the ileum datasets:
+
+```{r}
+ileum_cd$sample_type <- "ileum_cd"
+ileum_ctrl$sample_type <- "ileum_ctrl"
+ileum <- cbind(ileum_cd, ileum_ctrl)
+ileum$region <- "ileum"
+ileum
+```
+```{r}
+
+```
+
+
+```{r}
+saveRDS(ileum, "../data/output/spe/ileum.rds")
+```
+
+
+Combining the rectum datasets
+
+```{r}
+rectum_cd$sample_type <- "rectum_cd"
+rectum_ctrl$sample_type <- "rectum_ctrl"
+rectum <- cbind(rectum_cd, rectum_ctrl)
+rectum$region <- 'rectum'
+rectum
+```
+```{r}
+saveRDS(rectum, "../data/output/spe/rectum.rds")
+```
+ 
+ 
+ Combining the rectum and ileum datasets
+ 
+```{r}
+total <- cbind(ileum, rectum)
+
+total
+```
+Store the total dataset on R object spe which we shall save
+
+```{r}
+spe <- total
+colnames(spe) <- paste0('cell', seq_len(ncol(spe)))
+saveRDS(spe, "../data/output/spe/total.rds")
+```
+
+```{r}
+spe <- ileum
+```
+
+
+
+## Normalization QC
+We see the effects of normalizing each of the sample types to corresponding log and asinh normalization methods. 
+
+For each of the SPEs we run this and save the images:
+
+Before Normalization:
+
+```{r}
+raw_spe <- rectum_ctrl
+multi_dittoPlot(raw_spe, vars = rownames(raw_spe),
+               group.by = "sample_type", plots = "ridgeplot", 
+               assay = "counts")
+```
+
+
+After inverse sine normalization:
+
+```{r}
+multi_dittoPlot(raw_spe, vars = rownames(raw_spe),
+               group.by = "sample_type", plots = "ridgeplot", 
+               assay = "exprs") 
+```
+
+
+After log normalization:
+
+```{r}
+multi_dittoPlot(raw_spe, vars = rownames(raw_spe),
+               group.by = "sample_type", plots = "ridgeplot", 
+               assay = "logs")
+```
+
+Now we look at the compared normalization across samples. Firstly the raw counts, followed by the exprs and logs:
+
+```{r}
+multi_dittoPlot(spe, vars = rownames(spe),
+               group.by = "sample_type", plots = "ridgeplot", 
+               assay = "counts")
+```
+
+
+
+
+
+## Segmentation Quality Control 
+
+We look at the segmentation quality for each of the images one by on (ROIs):
+
+```{r}
+for (i in 0:4){
+  rm(images)
+  rm(masks)
+  
+  normalized_images <- readRDS("../data/output/images/ileum_cd.rds") # update
+  masks <- readRDS("../data/output/masks/ileum_cd.rds") # update
+  
+  normalized_images <- cytomapper::normalize(normalized_images, separateImages = TRUE)
+  normalized_images <- cytomapper::normalize(normalized_images, inputRange = c(0, 0.3))
+  
+  plotPixels(normalized_images[i],
+             mask = masks[i],
+             img_id = "sample_id",
+             missing_colour = "white",
+             colour_by = c("CD45", "CD20", "CD3", "CD4", "CD8", "E-Cadherin"),
+             colour = list(CD45 = c("black", "green"),
+                           CD20 = c("black", "yellow"),
+                           CD3 = c("black", "blue"),
+                           CD4 = c("black", "purple"),
+                           CD8 = c("black", "pink"),
+                           "E-Cadherin" = c("black", "red")),
+             legend = list(colour_by.title.cex = 0.7,
+                           colour_by.labels.cex = 0.7))
+}
+
+
+```
+
+### Heatmap Single Cell Expression by Channel
+
+```{r}
+set.seed(20220118)
+cur_cells <- sample(seq_len(ncol(spe)), 10000)
+
+rowData(spe)$use_channel <- !grepl("DAPI|CD21", rownames(spe))
+
+dittoHeatmap(spe[,cur_cells], 
+             genes = rownames(spe)[rowData(spe)$use_channel],
+             assay = "exprs", 
+             cluster_cols = FALSE, 
+             scale = "none",
+             heatmap.colors = viridis(100), 
+             annot.by = "sample_type")
+```
+
+
+
+## Image Level QC
+
+For each of the samples that consist of 5 ROI images each we want to check the signal to noise ratio (SNR) and mean cell marker per image. 
+
+### Ileum CD
+
+#### SNR
+
+```{r}
+ileum_cd_images <- readRDS('../data/output/images/ileum_cd.rds')
+ileum_cd_masks <- readRDS('../data/output/masks/ileum_cd.rds')
+
+cur_snr <- lapply(names(ileum_cd_images), function(x){
+    img <- ileum_cd_images[[x]]
+    mat <- apply(img, 3, function(ch){
+        # Otsu threshold
+        thres <- otsu(ch, range = c(min(ch), max(ch)), levels = 65536)
+        # Signal-to-noise ratio
+        snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
+        # Signal intensity
+        ps <- mean(ch[ch > thres])
+        
+        return(c(snr = snr, ps = ps))
+    })
+    t(mat) %>% as.data.frame() %>% 
+        mutate(image = x,
+               marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(log_mean = log2(mean(value))) %>%
+    pivot_wider(names_from = name, values_from = log_mean) %>%
+    ggplot() +
+    geom_point(aes(ps, snr)) +
+    geom_label_repel(aes(ps, snr, label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
+```
+
+#### Mean Cell Marker Per Image
+
+```{r}
+image_mean <- aggregateAcrossCells(ileum_cd, 
+                                   ids = ileum_cd$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "exprs")
+
+rowData(ileum_cd)$use_channel <- !grepl("DAPI|CD21", rownames(ileum_cd))
+
+dittoHeatmap(image_mean, genes = rownames(ileum_cd)[rowData(ileum_cd)$use_channel],
+             assay = "exprs", scale = 'row',
+             heatmap.colors = viridis(100), 
+             annot.by = c("sample_id"),
+             show_colnames = TRUE)
+```
+
+
+### Ileum CTRL
+
+#### SNR
+
+```{r}
+ileum_ctrl_images <- readRDS('../data/output/images/ileum_ctrl.rds')
+ileum_ctrl_masks <- readRDS('../data/output/masks/ileum_ctrl.rds')
+
+cur_snr <- lapply(names(ileum_ctrl_images), function(x){
+    img <- ileum_ctrl_images[[x]]
+    mat <- apply(img, 3, function(ch){
+        # Otsu threshold
+        thres <- otsu(ch, range = c(min(ch), max(ch)), levels = 65536)
+        # Signal-to-noise ratio
+        snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
+        # Signal intensity
+        ps <- mean(ch[ch > thres])
+        
+        return(c(snr = snr, ps = ps))
+    })
+    t(mat) %>% as.data.frame() %>% 
+        mutate(image = x,
+               marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(log_mean = log2(mean(value))) %>%
+    pivot_wider(names_from = name, values_from = log_mean) %>%
+    ggplot() +
+    geom_point(aes(ps, snr)) +
+    geom_label_repel(aes(ps, snr, label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
+```
+
+#### Mean Cell Marker Per Image
+
+```{r}
+image_mean <- aggregateAcrossCells(ileum_ctrl, 
+                                   ids = ileum_ctrl$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "exprs")
+
+rowData(ileum_ctrl)$use_channel <- !grepl("DAPI|CD21", rownames(ileum_cd))
+
+dittoHeatmap(image_mean, genes = rownames(ileum_ctrl)[rowData(ileum_ctrl)$use_channel],
+             assay = "exprs", scale = 'row',
+             heatmap.colors = viridis(100), 
+             annot.by = c("sample_id"),
+             show_colnames = TRUE)
+```
+
+
+### Rectum CD
+
+#### SNR
+
+```{r}
+rectum_cd_images <- readRDS('../data/output/images/rectum_cd.rds')
+rectum_cd_masks <- readRDS('../data/output/masks/rectum_cd.rds')
+
+cur_snr <- lapply(names(rectum_cd_images), function(x){
+    img <- rectum_cd_images[[x]]
+    mat <- apply(img, 3, function(ch){
+        # Otsu threshold
+        thres <- otsu(ch, range = c(min(ch), max(ch)), levels = 65536)
+        # Signal-to-noise ratio
+        snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
+        # Signal intensity
+        ps <- mean(ch[ch > thres])
+        
+        return(c(snr = snr, ps = ps))
+    })
+    t(mat) %>% as.data.frame() %>% 
+        mutate(image = x,
+               marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(log_mean = log2(mean(value))) %>%
+    pivot_wider(names_from = name, values_from = log_mean) %>%
+    ggplot() +
+    geom_point(aes(ps, snr)) +
+    geom_label_repel(aes(ps, snr, label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
+```
+
+#### Mean Cell Marker Per Image
+
+```{r}
+image_mean <- aggregateAcrossCells(rectum_cd, 
+                                   ids = rectum_cd$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "exprs")
+
+rowData(rectum_cd)$use_channel <- !grepl("DAPI|CD21", rownames(rectum_cd))
+
+dittoHeatmap(image_mean, genes = rownames(rectum_cd)[rowData(rectum_cd)$use_channel],
+             assay = "exprs", scale = 'row',
+             heatmap.colors = viridis(100), 
+             annot.by = c("sample_id"),
+             show_colnames = TRUE)
+```
+
+
+
+### Rectum CTRL
+
+#### SNR
+
+```{r}
+rectum_ctrl_images <- readRDS('../data/output/images/ileum_cd.rds')
+rectum_ctrl_masks <- readRDS('../data/output/masks/ileum_cd.rds')
+
+cur_snr <- lapply(names(rectum_ctrl_images), function(x){
+    img <- rectum_ctrl_images[[x]]
+    mat <- apply(img, 3, function(ch){
+        # Otsu threshold
+        thres <- otsu(ch, range = c(min(ch), max(ch)), levels = 65536)
+        # Signal-to-noise ratio
+        snr <- mean(ch[ch > thres]) / mean(ch[ch <= thres])
+        # Signal intensity
+        ps <- mean(ch[ch > thres])
+        
+        return(c(snr = snr, ps = ps))
+    })
+    t(mat) %>% as.data.frame() %>% 
+        mutate(image = x,
+               marker = colnames(mat)) %>% 
+        pivot_longer(cols = c(snr, ps))
+})
+
+cur_snr <- do.call(rbind, cur_snr)
+
+cur_snr %>% 
+    group_by(marker, name) %>%
+    summarize(log_mean = log2(mean(value))) %>%
+    pivot_wider(names_from = name, values_from = log_mean) %>%
+    ggplot() +
+    geom_point(aes(ps, snr)) +
+    geom_label_repel(aes(ps, snr, label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
+```
+
+
+#### Mean Cell Marker Per Image
+
+```{r}
+image_mean <- aggregateAcrossCells(rectum_ctrl, 
+                                   ids = rectum_ctrl$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "exprs")
+
+rowData(rectum_ctrl)$use_channel <- !grepl("DAPI|CD21", rownames(rectum_ctrl))
+
+dittoHeatmap(image_mean, genes = rownames(rectum_ctrl)[rowData(rectum_ctrl)$use_channel],
+             assay = "exprs", scale = 'row',
+             heatmap.colors = viridis(100), 
+             annot.by = c("sample_id"),
+             show_colnames = TRUE)
+```
+
+
+
+
+
+## Cell level QC
+
+```{r}
+colnames(ileum) <- paste0('cell', seq_len(ncol(ileum)))
+spe <- ileum
+```
+
+### Image Area Covered by Cells
+
+```{r}
+cell_density <- colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    # Compute the number of pixels covered by cells and 
+    # the total number of pixels
+    summarize(cell_area = sum(s.area),
+              no_pixels = mean(spatialCoords(spe)[,1]) * mean(spatialCoords(spe)[,2])) %>%
+    # Divide the total number of pixels 
+    # by the number of pixels covered by cells
+    mutate(covered_area = cell_area / no_pixels)
+
+# Visualize the image area covered by cells per image
+ggplot(cell_density) +
+        geom_point(aes(reorder(sample_id,covered_area), covered_area)) + 
+        theme_minimal(base_size = 15) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15)) +
+        ylim(c(0, 1)) +
+        ylab("% covered area") + xlab("")
+```
+The image area covered by cells is roughly the same, so there are no outliers in term of our ROIs.
+
+
+### SNR
+
+```{r}
+set.seed(220224)
+mat <- sapply(seq_len(nrow(spe)), function(x){
+    cur_exprs <- assay(spe, "exprs")[x,]
+    cur_counts <- assay(spe, "counts")[x,]
+    
+    cur_model <- Mclust(cur_exprs, G = 2)
+    mean1 <- mean(cur_counts[cur_model$classification == 1])
+    mean2 <- mean(cur_counts[cur_model$classification == 2])
+    
+    signal <- ifelse(mean1 > mean2, mean1, mean2)
+    noise <- ifelse(mean1 > mean2, mean2, mean1)
+    
+    return(c(snr = signal/noise, ps = signal))
+})
+    
+cur_snr <- t(mat) %>% as.data.frame() %>% 
+        mutate(marker = rownames(spe))
+
+cur_snr %>% ggplot() +
+    geom_point(aes(log2(ps), log2(snr))) +
+    geom_label_repel(aes(log2(ps), log2(snr), label = marker)) +
+    theme_minimal(base_size = 15) + ylab("Signal-to-noise ratio [log2]") +
+    xlab("Signal intensity [log2]")
+```
+
+
+### Cell Area by Sample ID plot
+
+```{r}
+dittoPlot(spe, var = "s.area", 
+          group.by = "sample_id", 
+          plots = "boxplot") +
+        ylab("Cell area") + xlab("")
+```
+
+
+### Cells per mm2 plot
+
+```{r}
+cell_density <- colData(spe) %>%
+    as.data.frame() %>%
+    group_by(sample_id) %>%
+    summarize(cell_count = n(),
+           no_pixels = mean(spatialCoords(spe)[,1]) * mean(spatialCoords(spe)[,2])) %>%
+    mutate(cells_per_mm2 = cell_count/(no_pixels/1000000))
+
+ggplot(cell_density) +
+    geom_point(aes(reorder(sample_id,cells_per_mm2), cells_per_mm2)) + 
+    theme_minimal(base_size = 15) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) +
+    ylab("Cells per mm2") + xlab("")
+```
+
+
+### Mean Cell Marker Expression Across All Samples 
+
+
+```{r}
+image_mean <- aggregateAcrossCells(ileum, 
+                                   ids = ileum$sample_id, 
+                                   statistics="mean",
+                                   use.assay.type = "exprs")
+
+rowData(ileum)$use_channel <- !grepl("DAPI|CD21", rownames(ileum))
+
+image_mean$sample_id <- factor(image_mean$sample_id, 
+                           levels = c("ileum_ctrl_1", "ileum_ctrl_2", "ileum_ctrl_3", 
+                                     "ileum_ctrl_4", "ileum_ctrl_5",
+                                     "ileum_cd_1", "ileum_cd_2", "ileum_cd_3", 
+                                     "ileum_cd_4", "ileum_cd_5"))
+
+dittoHeatmap(image_mean, genes = rownames(ileum)[rowData(ileum)$use_channel],
+             assay = "exprs", scale = 'none',
+             heatmap.colors = viridis(100), 
+             annot.by = c("sample_id"),
+             show_colnames = TRUE,
+             order.by = )
+```
+
+
+
+
+## Dimensionality Reduction QC
+
+To observe differences between our chosen ROIs and indications, we do DR using UMAP and TSNE, look for potential batch effects
+
+```{r}
+set.seed(220225)
+spe <- runUMAP(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs") 
+spe <- runTSNE(spe, subset_row = rowData(spe)$use_channel, exprs_values = "exprs") 
+```
+
+Now we construct some plots"
+
+```{r}
+
+# Visualize Sample Type 
+p1 <- dittoDimPlot(spe, var = "sample_type", reduction.use = "UMAP", size = 0.3) + 
+    ggtitle("Sample ID on UMAP")
+p2 <- dittoDimPlot(spe, var = "sample_type", reduction.use = "TSNE", size = 0.3) + 
+    ggtitle("Sample ID on TSNE")
+
+# Visualize Sample ID, ROI
+p3 <- dittoDimPlot(spe, var = "sample_id", reduction.use = "UMAP", size = 0.3) + 
+    ggtitle("Sample ID on UMAP")
+p4 <- dittoDimPlot(spe, var = "sample_id", reduction.use = "TSNE", size = 0.3) + 
+    ggtitle("Sample ID on TSNE")
+
+# Visualize the region visualized
+p5 <- dittoDimPlot(spe, var = "region", reduction.use = "UMAP", size = 0.3) + 
+    ggtitle("Region on UMAP")
+p6 <- dittoDimPlot(spe, var = "region", reduction.use = "TSNE", size = 0.3) + 
+    ggtitle("Region on TSNE")
+
+(p1 + p2) / (p5 + p6)
+```
+
+
+## Clustering on ileum/rectum level 
+
+### Ileum
+
+```{r}
+set.seed(220225)
+spe <- runUMAP(ileum, subset_row = rowData(ileum)$use_channel, exprs_values = "exprs") 
+spe <- runTSNE(ileum, subset_row = rowData(ileum)$use_channel, exprs_values = "exprs") 
+```
+
+```{r}
+# Visualize Sample ID, ROI
+p7 <- dittoDimPlot(ileum, var = "sample_id", reduction.use = "UMAP", size = 0.2) + 
+    ggtitle("Sample ID on UMAP")
+p8 <- dittoDimPlot(ileum, var = "sample_id", reduction.use = "TSNE", size = 0.2) + 
+    ggtitle("Sample ID on TSNE")
+
+p8
+```
+
+### Rectum
+
+```{r}
+set.seed(220225)
+spe <- runUMAP(rectum, subset_row = rowData(rectum)$use_channel, exprs_values = "exprs") 
+spe <- runTSNE(rectum, subset_row = rowData(rectum)$use_channel, exprs_values = "exprs") 
+```
+
+```{r}
+# Visualize Sample ID, ROI
+p9 <- dittoDimPlot(rectum, var = "sample_type", reduction.use = "UMAP", size = 0.2) + 
+    ggtitle("Sample ID on UMAP")
+p10 <- dittoDimPlot(rectum, var = "sample_type", reduction.use = "TSNE", size = 0.2) + 
+    ggtitle("Sample ID on TSNE")
+
+p9 + p10
+```
+
+
+
+# Save the total SPE again
+
+```{r}
+saveRDS(spe, "../data/output/spe/total.rds")
+```
+
+```{r}
+char_list <- strsplit("ATCG", "")[[1]]
+char_list[1]
+
+```
+

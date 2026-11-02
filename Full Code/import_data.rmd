@@ -1,0 +1,42 @@
+---
+title: "Import Data"
+output: html_document
+date: "2025-11-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Import Data 
+This markdown file imports data from the scripts `load_csv.r` and `read_data.r` generating spreadsheets that quantify the segmented cells for our pipeline. 
+
+# Import and install any packages that are missing in the environment
+
+The `install.packages` script installs the necessary libraries required for our analysis. 
+
+```{r}
+source("install_packages.r", local = knitr::knit_global())
+```
+
+# Generate and save SPE object as RDS files
+
+We convert each of images and their segmented masks to Spatial Experiment Object (SPE) format. Then we save the SPE files as RDS objects.
+
+```{r}
+args <- c("ileum_cd")
+source("read_data.r", local = knitr::knit_global())
+
+args <- c("ileum_ctrl")
+source("read_data.r", local = knitr::knit_global())
+```
+
+
+# Generate CSV files 
+
+In this step we do some wrangling on the SPE objects, generate two assays (asinh and log normalization) and save the counts assay as the CSV file for our pipeline. Then we update the RDS file to include the normalized assays that we selected to view the result of normalization. To do that we run the `load_csv` script. 
+
+```{r}
+source("../load_csv.r", local = knitr::knit_global())
+```
+
